@@ -180,11 +180,11 @@ processors:
       ignore_missing: true
   - rename:
       field: teleport.audit.kubernetes_users
-      target_field: teleport.audit.kubernetes.users
+      target_field: teleport.audit.kubernetes.user
       ignore_missing: true
   - rename:
       field: teleport.audit.kubernetes_groups
-      target_field: teleport.audit.kubernetes.groups
+      target_field: teleport.audit.kubernetes.group
       ignore_missing: true
   - rename:
       field: teleport.audit.kubernetes_labels
