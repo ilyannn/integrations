@@ -4,7 +4,7 @@ The Syslog Router integration routes incoming syslog events to the correct Elast
 
 ## Common use cases
 
-- **Centralized syslog ingestion**: Receive syslog from many different network devices on a single port and automatically route each event to its corresponding integration (Cisco ASA, Fortinet FortiGate, Palo Alto PAN-OS, etc.) for proper parsing.
+- **Centralized syslog ingestion**: Receive syslog from many different network devices on a single port and automatically route each event to its corresponding integration (Cisco ASA, Fortinet FortiGate, Palo Alto Next-Gen Firewall, etc.) for proper parsing.
 - **Multi-vendor firewall environments**: Organizations running firewalls and security appliances from multiple vendors can consolidate syslog collection through a single Elastic Agent policy rather than deploying separate inputs per vendor.
 - **Rapid onboarding of syslog sources**: Add support for new device types by adding a single `if/then` block with a regex pattern, without needing to deploy additional agents or inputs.
 
@@ -52,7 +52,7 @@ The following integrations (listed here alphabetically, but processed in a diffe
 | Imperva SecureSphere (CEF only) | `imperva.securesphere`           | `CEF:0\|Imperva Inc.\|SecureSphere`                     |
 | Iptables                        | `iptables.log`                   | `IN=`                                                   |
 | Juniper SRX                     | `juniper_srx.log`                | `RT_UTM -` or `RT_FLOW -`                               |
-| Palo Alto PAN-OS                | `panw.panos`                     | `1,[0-9]{4}/[0-9]{2}/[0-9]{2}`                          |
+| Palo Alto Next-Gen Firewall                | `panw.panos`                     | `1,[0-9]{4}/[0-9]{2}/[0-9]{2}`                          |
 | QNAP NAS                        | `qnap_nas.log`                   | `qulogd\[[0-9]+\]:`                                     |
 | Snort                           | `snort.log`                      | `\[[0-9]:[0-9]+:[0-9]\]`                                |
 | Sonicwall Firewall              | `sonicwall_firewall.log`         | `<[0-9]+>  id=firewall sn=[0-9a-zA-Z]+`                 |

@@ -40,7 +40,7 @@ This integration supports routing events from the following 22 pre-configured in
 - Imperva SecureSphere (CEF format only)
 - Iptables
 - Juniper SRX
-- Palo Alto PAN-OS
+- Palo Alto Next-Gen Firewall
 - QNAP NAS
 - Snort
 - Sonicwall Firewall
@@ -63,13 +63,13 @@ The Syslog Router integration collects log messages of the following types:
 - Syslog events (UDP): You can listen for incoming UDP syslog packets on a configurable address and port (default: `localhost:9514`).
 - Syslog events (Filestream): You can monitor local log files (default: `/var/log/syslog.log`). This input is turned off by default.
 
-This integration acts as a transit layer that collects raw syslog events and routes them to other Elastic integrations for parsing. It uses a minimal ingest pipeline that sets `ecs.version` and handles errors. The actual parsing is performed by the target integration's ingest pipeline.
+This integration acts as a transit layer that collects raw syslog events and routes them to other Elastic integrations for parsing. Events that are not matched and rerouted are processed by a minimal ingest pipeline that sets `ecs.version` and handles errors. The actual parsing of routed events is performed by the target integration's ingest pipeline.
 
 The routing mechanism works as follows:
 
 1. Each event is matched against ordered regex patterns on the `message` field.
 2. When a match is found, the `_conf.dataset` field is set to the target integration's data stream (for example, `cisco_asa.log` or `fortinet_fortigate.log`).
-3. The `routing_rules.yml` configuration then reroutes the event to the target data stream defined in `{_conf.dataset}`.
+3. The `routing_rules.yml` configuration then reroutes the event to the target data stream defined in `_conf.dataset`.
 
 Based on your routing configuration, data is directed toward specialized integrations including:
 
@@ -112,13 +112,7 @@ Before you add the Syslog Router, you can install the assets for each integratio
 
 #### Configure syslog on network devices
 
-You can configure each network device to forward its syslog stream to the Elastic Agent host on the port you plan to use (default is `9514`). Follow the vendor-specific instructions for your devices:
-
-- **Cisco ASA**: Use the `logging host` command to specify the Elastic Agent host and port.
-- **Palo Alto PAN-OS**: Create a Syslog Server Profile under **Device > Server Profiles > Syslog** that points to the IP address of your Elastic Agent.
-- **Fortinet FortiGate**: Configure the syslog destination under **Log & Report > Log Settings** using the Elastic Agent host address.
-
-Refer to each vendor's documentation for detailed syslog forwarding instructions.
+Configure each network device to forward its syslog stream to the Elastic Agent host on the port you plan to use (default is `9514`). Refer to each vendor's documentation for detailed syslog forwarding instructions.
 
 ### Set up steps in Kibana
 
@@ -139,16 +133,16 @@ After your devices are ready to send data, you can set up the integration in Kib
 
 To ensure your deployment is working correctly, follow these steps:
 
-1. Verify the agent is receiving data by checking the Elastic Agent logs. You can also send a test message from the agent host to itself to confirm the port is open and listening:
+1. Verify the agent is receiving data by checking the Elastic Agent logs for the configured input (TCP/UDP) to confirm it is listening. You can send a test syslog message from the agent host to itself to confirm the port is open:
    ```bash
-   echo "<190>%ASA-6-302013: test message" | nc localhost 9514
+   echo 'Oct 10 2018 12:34:56 localhost CiscoASA[999]: %ASA-4-106023: Deny tcp src outside:192.168.19.254/80 dst inside:172.31.98.44/8277 by access-group "inbound" [0x0, 0x0]' | nc localhost 9514
    ```
-2. In Kibana, navigate to **Analytics > Discover**.
-3. Select the `logs-*` data view.
-4. Search for your test event or real data using KQL. For example, to check for routed Cisco ASA logs, use: `data_stream.dataset : "cisco_asa.log"`.
-5. Verify that the events are correctly parsed and that fields from the target integration are present.
-6. To find events that didn't match any routing pattern, search for: `data_stream.dataset : "syslog_router.log"`.
-7. Examine the `message` field of these unmatched events to determine if you need to add or adjust your reroute patterns.
+3. In Kibana, navigate to **Analytics > Discover**.
+4. Select the `logs-*` data view.
+5. Search for routed events using KQL. For example, to check for routed Cisco ASA logs, use: `data_stream.dataset : "cisco_asa.log"`.
+6. Verify that the events are correctly parsed and that fields from the target integration are present.
+7. To find events that didn't match any routing pattern, search for: `data_stream.dataset : "syslog_router.log"`.
+8. Examine the `message` field of these unmatched events to determine if you need to add or adjust your reroute patterns.
 
 ## Troubleshooting
 
